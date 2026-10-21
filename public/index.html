@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Classroom Blast: instant classroom announcements for teachers and students."
+    />
+    <title>Classroom Blast System</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/app.js"></script>
+  </head>
+
+  <body>
+    <noscript><p class="noscript">Classroom Blast needs JavaScript to run.</p></noscript>
+
+    <!-- Shown while we check whether the visitor is already logged in -->
+    <div id="splash" class="splash" role="status">Loading…</div>
+
+    <!-- ================= LOGIN / SIGN UP ================= -->
+    <div id="loginPage" class="login-page" hidden>
+      <div class="login-box">
+        <div class="login-logo">Classroom<span>Blast</span></div>
+
+        <h1 id="authTitle">Welcome back</h1>
+        <p class="login-subtitle" id="authSubtitle">Log in to see classroom updates</p>
+
+        <div class="auth-tabs" role="tablist" aria-label="Log in or sign up">
+          <button type="button" role="tab" class="auth-tab active" id="tabLogin" data-mode="login" aria-selected="true" aria-controls="authForm">Log in</button>
+          <button type="button" role="tab" class="auth-tab" id="tabRegister" data-mode="register" aria-selected="false" aria-controls="authForm">Sign up</button>
+        </div>
+
+        <form id="authForm" novalidate>
+          <div class="login-field" id="nameField" hidden>
+            <label for="authName">Full name</label>
+            <input type="text" id="authName" autocomplete="name" maxlength="60" placeholder="Your full name" />
+          </div>
+
+          <div class="login-field">
+            <label for="authEmail">Email</label>
+            <input type="email" id="authEmail" autocomplete="email" maxlength="254" placeholder="you@school.edu" />
+          </div>
+
+          <div class="login-field">
+            <label for="authPassword">Password</label>
+            <div class="password-wrap">
+              <input type="password" id="authPassword" autocomplete="current-password" maxlength="72" placeholder="Enter your password" />
+              <button type="button" id="togglePassword" class="toggle-password" aria-pressed="false" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <p id="authError" class="form-error" role="alert" hidden></p>
+
+          <button type="submit" class="login-button" id="authSubmit">Log in</button>
+        </form>
+
+        <p class="login-note" id="authNote"></p>
+      </div>
+    </div>
+
+    <!-- ================= APP (only shown when logged in) ================= -->
+    <div id="app" hidden>
+      <header>
+        <div class="nav">
+          <div class="logo">Classroom<span>Blast</span></div>
+
+          <nav class="nav-links" aria-label="Main">
+            <a href="#home" class="nav-link" data-page="home">Home</a>
+            <a href="#announcements" class="nav-link" data-page="announcements">Announcements</a>
+            <a href="#send" class="nav-link admin-only" data-page="send">Send Blast</a>
+          </nav>
+
+          <div class="user-box">
+            <div class="user-info">
+              <span id="userName" class="user-name"></span>
+              <span id="userRole" class="role-pill"></span>
+            </div>
+            <button type="button" id="logoutBtn" class="nav-cta">Log out</button>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <!-- ===== HOME ===== -->
+        <section id="home" class="page" aria-labelledby="homeTitle">
+          <div class="hero">
+            <div>
+              <h1 id="homeTitle" tabindex="-1">
+                <span class="admin-only">Send important <em>classroom updates</em> instantly.</span>
+                <span class="student-only">Never miss a <em>classroom update</em> again.</span>
+              </h1>
+
+              <p class="admin-only">
+                Post announcements for your class, edit them when plans change, and remove them when they are no
+                longer needed.
+              </p>
+              <p class="student-only">
+                Every message from your teachers in one place. Important updates are highlighted so they stand out.
+              </p>
+
+              <div class="hero-actions">
+                <a href="#send" class="btn-primary admin-only">Send Announcement</a>
+                <a href="#announcements" class="btn-ghost admin-only">View Blasts</a>
+                <a href="#announcements" class="btn-primary student-only">View Announcements</a>
+              </div>
+
+              <div class="stat-row">
+                <div><strong id="statTotal">0</strong><span>Announcements</span></div>
+                <div><strong id="statImportant">0</strong><span>Important</span></div>
+                <div><strong id="statRecent">0</strong><span>Last 24 hours</span></div>
+              </div>
+            </div>
+
+            <a href="#announcements" class="hero-card" aria-label="Latest announcement. Open all announcements">
+              <span class="tag">LATEST BLAST</span>
+              <h3 id="latestTitle">No announcements yet</h3>
+              <p id="latestMessage"></p>
+              <span class="latest-meta" id="latestMeta"></span>
+            </a>
+          </div>
+        </section>
+
+        <!-- ===== ANNOUNCEMENTS ===== -->
+        <section id="announcements" class="page" aria-labelledby="annTitle">
+          <div class="section">
+            <div class="section-head">
+              <div>
+                <h2 id="annTitle" tabindex="-1">Classroom Announcements</h2>
+                <p>View all classroom messages and important updates.</p>
+              </div>
+
+              <div class="toolbar">
+                <div class="search-wrap">
+                  <label for="searchInput" class="sr-only">Search announcements</label>
+                  <input type="search" id="searchInput" placeholder="Search subject, message or teacher" maxlength="100" />
+                </div>
+
+                <div class="filters" id="filterBar" role="group" aria-label="Filter by priority">
+                  <button type="button" class="filter-btn active" data-type="all" aria-pressed="true">All</button>
+                  <button type="button" class="filter-btn" data-type="normal" aria-pressed="false">Normal</button>
+                  <button type="button" class="filter-btn" data-type="important" aria-pressed="false">Important</button>
+                </div>
+              </div>
+            </div>
+
+            <p id="listStatus" class="list-status" role="status" aria-live="polite"></p>
+            <div class="blast-grid" id="blastGrid"></div>
+
+            <div class="load-more-wrap">
+              <button type="button" id="loadMoreBtn" class="btn-ghost" hidden>Load more</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SEND / EDIT BLAST (admins only) ===== -->
+        <section id="send" class="page" aria-labelledby="sendTitle">
+          <div class="section">
+            <div class="section-head">
+              <div>
+                <h2 id="sendTitle" tabindex="-1">Send a Classroom Blast</h2>
+                <p id="sendSubtitle">Posting as <strong id="postingAs"></strong></p>
+              </div>
+            </div>
+
+            <form class="admin-panel" id="blastForm" novalidate>
+              <div class="admin-grid">
+                <div class="field">
+                  <label for="subject">Subject</label>
+                  <input type="text" id="subject" maxlength="80" placeholder="e.g. DSA" />
+                </div>
+
+                <div class="field">
+                  <label for="priority">Priority</label>
+                  <select id="priority">
+                    <option value="normal">Normal</option>
+                    <option value="important">Important</option>
+                  </select>
+                </div>
+
+                <div class="field field-wide">
+                  <label for="message">Announcement</label>
+                  <textarea id="message" rows="5" maxlength="1000" placeholder="Enter classroom message"></textarea>
+                  <div class="counter" id="messageCounter">0 / 1000</div>
+                </div>
+              </div>
+
+              <p id="blastError" class="form-error" role="alert" hidden></p>
+
+              <div class="admin-actions">
+                <button type="button" class="btn-ghost" id="cancelEditBtn" hidden>Cancel</button>
+                <button type="submit" class="btn-primary" id="blastSubmit">+ Send Blast</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <footer>© 2026 Classroom Blast System. Built for learning purposes.</footer>
+    </div>
+
+    <!-- Delete confirmation -->
+    <dialog id="confirmDialog" class="dialog" aria-labelledby="confirmTitle">
+      <form method="dialog">
+        <h2 id="confirmTitle">Delete announcement?</h2>
+        <p id="confirmText"></p>
+        <div class="dialog-actions">
+          <button type="submit" value="cancel" class="btn-ghost" autofocus>Cancel</button>
+          <button type="submit" value="confirm" class="btn-danger" id="confirmOk">Delete</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>
